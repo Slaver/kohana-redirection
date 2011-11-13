@@ -53,10 +53,15 @@ class Redirection {
 	 */
 	public function run()
 	{
-        $search = URL::site(Request::factory()->uri());
-
-		if ($this->config)
+        if ($this->config)
         {
+            // Dirty hacks for URL request detection…
+            // Can't use Request::factory()->url(); before their initializaion
+
+            $protocol = (isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on') ? 'https://' : 'http://';
+            $url = $protocol.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+            $search = str_replace($protocol.$_SERVER['HTTP_HOST'].URL::site(), '/', $url);
+
             foreach ($this->config as $from=>$to)
 		    {
                 $from = preg_replace('@#(.*)@', '', $from);
