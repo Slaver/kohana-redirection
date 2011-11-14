@@ -89,7 +89,8 @@ class Redirection {
                         $redirect = URL::site($redirect, TRUE);
                     }
 
-                    Request::initial()->redirect($redirect, 301);
+                    header('Location: '.$redirect, TRUE, 301);
+                    exit;
 			    }
 		    }
         }
