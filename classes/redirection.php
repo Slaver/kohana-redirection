@@ -53,8 +53,11 @@ class Redirection {
 	 */
 	public function run()
 	{
-        if ($this->config)
+        // Do not use in CLI
+        if ($this->config && ! Kohana::$is_cli)
         {
+            $token = Profiler::start('Redirection', 'run');
+
             // Dirty hacks for URL request detection…
             // Can't use Request::factory()->url(); before their initializaion
 
@@ -93,6 +96,8 @@ class Redirection {
                     exit;
 			    }
 		    }
+
+            Profiler::stop($token);
         }
 	}
 }
