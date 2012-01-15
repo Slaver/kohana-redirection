@@ -78,7 +78,10 @@ class Redirection {
 				    $redirect = ltrim(preg_replace("/$from/", $to, $search), '/');
 
                     // Log redirection
-                    Kohana::$log->add(Log::INFO, 'Redirect from '.$search.' to '.$redirect);
+                    DBLog::instance()->add('redirection', 'INFO', 'Redirect from :from to :to', array(
+                        ':from' => $search,
+                        ':to'   => '/'.$redirect,
+                    ));
 
                     // Check if redirect to other site
                     $bits = explode('/', $redirect); 
