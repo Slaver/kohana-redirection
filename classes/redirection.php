@@ -65,7 +65,7 @@ class Redirection {
             $url = $protocol.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
             $search = str_replace($protocol.$_SERVER['HTTP_HOST'].URL::site(), '/', $url);
 
-            foreach ($this->config as $from=>$to)
+            foreach ($this->config as $from => $to)
 		    {
                 $from = preg_replace('@#(.*)@', '', $from);
                 $from = str_replace("\n", "\r", $from);
