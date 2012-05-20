@@ -1,0 +1,13 @@
+1. Init module in bootstrap.php:
+
+Kohana::modules(array(
+    'kohana-redirection'=> MODPATH.'kohana-redirection',
+));
+
+2. Create config/redirection.php:
+
+return array
+(
+    'category(.*)'  => '$1',
+    'photos(.*)'    => 'photo$1',
+);
