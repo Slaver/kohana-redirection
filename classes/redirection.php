@@ -76,7 +76,7 @@ class Redirection {
                     $redirect = ltrim(preg_replace("/$from/", $to, $search), '/');
 
                     // Log redirection
-                    if (array_key_exists('kohana-dblog', Kohana::modules()) && $this->request->is_initial())
+                    if (array_key_exists('kohana-dblog', Kohana::modules()))
                     {
                         DBLog::instance()->add('redirection', 'INFO', 'Redirect from :from to :to', array(
                             ':from' => $search,
