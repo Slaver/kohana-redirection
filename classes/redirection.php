@@ -2,57 +2,55 @@
 
 /**
  * Redirection module without using of Apache .htaccess files
- * 
- * @todo 		404 error monitoring
  *
- * @package		Redirection
- * @author		Viacheslav Radionov
- * @copyright	(c) 2010 Viacheslav Radionov <radionov@gmail.com>
- * @license		http://kohanaphp.com/license.html
+ * @package      Redirection
+ * @author       Viacheslav Radionov
+ * @copyright    (c) 2010 Viacheslav Radionov <radionov@gmail.com>
+ * @license      http://kohanaphp.com/license.html
  */
 class Redirection {
 
-	// Instances
-	protected static $instance;
+    // Instances
+    protected static $instance;
 
-	/**
-	 * Singleton pattern
-	 *
-	 * @return Redirection
-	 */
-	public static function instance()
-	{
-		if ( ! isset(Redirection::$instance))
-		{
-			// Load the configuration for this type
+    /**
+     * Singleton pattern
+     *
+     * @return Redirection
+     */
+    public static function instance()
+    {
+        if ( ! isset(Redirection::$instance))
+        {
+            // Load the configuration for this type
             $config = Kohana::$config->load('redirection');
 
-			// Create a new session instance
-			Redirection::$instance = new Redirection($config);
-		}
+            // Create a new session instance
+            Redirection::$instance = new Redirection($config);
+        }
 
-		return Redirection::$instance;
-	}
+        return Redirection::$instance;
+    }
 
-	protected $config;
+    protected $config;
 
-	/**
-	 * Loads configuration options
-	 *
-	 * @return  void
-	 */
-	public function __construct($config = array())
-	{
-		$this->config = $config;
-	}
+    /**
+     * Loads configuration options
+     *
+     * @return  void
+     */
+    public function __construct($config = array())
+    {
+        $this->config = $config;
+    }
 
-	/**
-	 * Check matches and redirect
-	 *
-	 * @return  void
-	 */
-	public function run()
-	{
+    /**
+     * Check matches and redirect
+     *
+     * @return  void
+     */
+    public function run()
+    {
         // Do not use in CLI
         if ($this->config && ! Kohana::$is_cli)
         {
@@ -66,22 +64,25 @@ class Redirection {
             $search = str_replace($protocol.$_SERVER['HTTP_HOST'].URL::site(), '/', $url);
 
             foreach ($this->config as $from => $to)
-		    {
+            {
                 $from = preg_replace('@#(.*)@', '', $from);
                 $from = str_replace("\n", "\r", $from);
                 $from = str_replace('\\ ', '%20', $from);
                 $from = str_replace("/", "\/", $from);
 
                 if (preg_match("/$from/i", $search, $matches))
-			    {
-				    // Generate redirection url and remove extra slashes
-				    $redirect = ltrim(preg_replace("/$from/", $to, $search), '/');
+                {
+                    // Generate redirection url and remove extra slashes
+                    $redirect = ltrim(preg_replace("/$from/", $to, $search), '/');
 
                     // Log redirection
-                    DBLog::instance()->add('redirection', 'INFO', 'Redirect from :from to :to', array(
-                        ':from' => $search,
-                        ':to'   => '/'.$redirect,
-                    ));
+                    if (array_key_exists('kohana-dblog', Kohana::modules()) && $this->request->is_initial())
+                    {
+                        DBLog::instance()->add('redirection', 'INFO', 'Redirect from :from to :to', array(
+                            ':from' => $search,
+                            ':to'   => '/'.$redirect,
+                        ));
+                    }
 
                     // Check if redirect to other site
                     $bits = explode('/', $redirect); 
@@ -97,10 +98,10 @@ class Redirection {
 
                     header('Location: '.$redirect, TRUE, 301);
                     exit;
-			    }
-		    }
+                }
+            }
 
             Profiler::stop($token);
         }
-	}
+    }
 }
